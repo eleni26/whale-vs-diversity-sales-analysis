@@ -1,17 +1,16 @@
 # Whale vs Diversity Sales Analysis
-
 SQL star schema + Power BI dashboard analyzing Whale orders vs diversified healthy pipe revenue by territory — built on AdventureWorks2025.
 
 ## Dashboard
-![Dashboard](assets/Whale%20Sales%20Dashboard.png)
+![Dashboard](Whale%20Sales%20Dashboard.png)
 
 ## Star Schema
-![Star Schema](assets/Whale%20Sale%20Star%20Schema.png)
+![Star Schema](Whale%20Sale%20Star%20schema.png)
 
 ## Overview
 This project builds a star schema on top of AdventureWorks2025 to answer one key business question: **are we over-indexed on Whale orders (>$50K single orders) or do we have a healthy, diversified sales pipeline?**
 
-## Star Schema
+## Data Model
 | Table | Type | Description |
 |---|---|---|
 | `FactSales` | Fact | Order line items with revenue, qty, territory, salesperson |
