@@ -1,4 +1,5 @@
 # Whale vs Diversity Sales Analysis
+
 SQL star schema + Power BI dashboard analyzing Whale orders vs diversified healthy pipe revenue by territory — built on AdventureWorks2025.
 
 ## Dashboard
@@ -7,24 +8,58 @@ SQL star schema + Power BI dashboard analyzing Whale orders vs diversified healt
 ## Star Schema
 ![Star Schema](Whale%20Sale%20Star%20schema.png)
 
-## Overview
-This project builds a star schema on top of AdventureWorks2025 to answer one key business question: **are we over-indexed on Whale orders (>$50K single orders) or do we have a healthy, diversified sales pipeline?**
+## 📐 Architecture
 
-## Data Model
-| Table | Type | Description |
+A star schema data mart is built via a single SQL Server stored procedure (`Procedure Scripts.sql`):
+
+| Object | Type | Description |
 |---|---|---|
-| `FactSales` | Fact | Order line items with revenue, qty, territory, salesperson |
-| `DimProduct` | Dimension | Product name and category |
-| `DimSalesTerritory` | Dimension | Territory, group, and country |
-| `DimSalesPerson` | Dimension | Salesperson names |
-| `DimDate` | Dimension | Date breakdown by month, quarter, year |
+| `DimDate` | Table | Calendar attributes (year, quarter, month) |
+| `DimProduct` | Table | Product hierarchy (category → subcategory) |
+| `DimSalesTerritory` | Table | Territory, region group, and country |
+| `DimSalesPerson` | Table | Salesperson names |
+| `FactSales` | Table | Order-line grain — qty, unit price, line total |
+| `v_FactSales_WhaleAnalysis` | View | Fact + whale classification + KPIs (Power BI source) |
+| `v_DimProduct_Diversity` | View | Product revenue split by order category (Power BI source) |
+| `v_DimTerritory_GapAnalysis` | View | Territory lookup for slicer filtering (Power BI source) |
 
-## Views
-- **`v_FactSales_WhaleAnalysis`** — classifies orders as Whale vs Healthy Pipe, computes AOV, Order Count, Total Revenue, Whale Concentration
-- **`v_DimProduct_Diversity`** — breaks revenue per product into Whale vs Healthy Pipe with Revenue Diversity %
-- **`v_DimTerritory_GapAnalysis`** — territory lookup for slicer filtering
+## 📈 KPI Summary
 
-## Tech Stack
-- SQL Server / T-SQL
-- AdventureWorks2025
-- Power BI
+| Metric | Value |
+|---|---|
+| Total Revenue | 80.5 M |
+| Whale Concentration | 45.5 % |
+| Revenue Diversity | 54.5 % |
+| Average Order Value (AOV) | 21.1 K |
+| Order Count | 215 K |
+
+## 🚀 Setup
+
+### Prerequisites
+- SQL Server with **AdventureWorks2025** restored
+- Power BI Desktop
+
+### 1 — Build the data mart
+
+```sql
+USE [AdventureWorks2025];
+GO
+EXEC dbo.sp_CreateFactSAndDimTables;
+GO
+```
+
+The procedure drops and recreates all objects — safe to re-run at any time.
+
+### 2 — Connect Power BI
+- **Get Data → SQL Server** → point to your AdventureWorks2025 database
+- Import the three reporting views:
+  - `v_FactSales_WhaleAnalysis`
+  - `v_DimProduct_Diversity`
+  - `v_DimTerritory_GapAnalysis`
+- In the **Model view**, confirm relationships on `TerritoryID` and `ProductID`
+- Add DAX measures for AOV, Whale Concentration, Revenue Diversity %, etc.
+
+## 🛠️ Tech Stack
+- **SQL Server** — stored procedure, star schema, views
+- **T-SQL** — data transformation and mart build
+- **Power BI Desktop** — data model, DAX measures, report visuals
